@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash
 import uuid
 from database import get_db_connection
-from admin import admin_required
+from .admin import admin_required
 
 user_blueprint = Blueprint('user', __name__)
 

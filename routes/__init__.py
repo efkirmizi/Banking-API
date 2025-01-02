@@ -1,19 +1,19 @@
 from flask import Blueprint
 
 # Import all blueprints
-from user import user_blueprint
-from admin import admin_blueprint
-from account import account_blueprint
-from card import card_blueprint
-from branch import branch_blueprint
-from credit_score import credit_score_blueprint
-from customer import customer_blueprint
-from customer_support import customer_support_blueprint
-from employee import employee_blueprint
-from loan import loan_blueprint
-from loan_payment import loan_payment_blueprint
-from transaction import transaction_blueprint
-from auth import auth_blueprint
+from .user import user_blueprint
+from .admin import admin_blueprint
+from .account import account_blueprint
+from .card import card_blueprint
+from .branch import branch_blueprint
+from .credit_score import credit_score_blueprint
+from .customer import customer_blueprint
+from .customer_support import customer_support_blueprint
+from .employee import employee_blueprint
+from .loan import loan_blueprint
+from .loan_payment import loan_payment_blueprint
+from .transaction import transaction_blueprint
+from .auth import auth_blueprint
 
 # Create a global blueprint to register all sub-blueprints
 routes_blueprint = Blueprint('routes', __name__)

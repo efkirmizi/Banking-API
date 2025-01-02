@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from werkzeug.exceptions import BadRequest
 import uuid
 from database import get_db_connection
-from admin import admin_required
+from .admin import admin_required
 
 customer_blueprint = Blueprint('customer', __name__)
 

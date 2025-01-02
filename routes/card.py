@@ -3,7 +3,7 @@ from werkzeug.exceptions import BadRequest
 import uuid
 from datetime import date
 from database import get_db_connection
-from admin import admin_required
+from .admin import admin_required
 
 card_blueprint = Blueprint('card', __name__)
 
