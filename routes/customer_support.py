@@ -154,3 +154,41 @@ def delete_ticket(ticket_id):
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@customer_support_blueprint.route('/top_resolvers', methods=['GET'])
+@admin_required
+def api_employees_top_resolvers():
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
+
+        query = """
+        WITH ResolvedTickets AS (
+            SELECT E.employee_id, E.first_name, E.last_name, COUNT(CS.ticket_id) AS resolved_tickets
+            FROM employee E
+            JOIN customer_support CS ON E.employee_id = CS.employee_id
+            WHERE CS.status = 'RESOLVED'
+            GROUP BY E.employee_id, E.first_name, E.last_name
+        )
+        SELECT employee_id, first_name, last_name, resolved_tickets
+        FROM ResolvedTickets
+        WHERE resolved_tickets = (
+            SELECT MAX(resolved_tickets) FROM ResolvedTickets
+        );
+        """
+        cursor.execute(query)
+        results = cursor.fetchall()
+
+        if not results:
+            return jsonify({'message': 'No employees found meeting the criteria.'}), 404
+
+        return jsonify(results)
+
+    except Exception as e:
+        return jsonify({'error': 'An error occurred while fetching top resolvers.', 'details': str(e)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()

@@ -170,3 +170,67 @@ def delete_branch(branch_id):
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+def get_branches_with_conditions(min_employees: int = 5, min_accounts: int = 3):
+    """
+    Fetch branches with a minimum number of employees and accounts.
+
+    :param min_employees: Minimum number of employees required (default is 5).
+    :param min_accounts: Minimum number of accounts required (default is 3).
+    :return: List of dictionaries containing branch names, employee counts, and account counts.
+    """
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
+
+        query = """
+        SELECT B.branch_name, 
+               COUNT(DISTINCT E.employee_id) AS employee_count, 
+               COUNT(DISTINCT A.account_id) AS account_count 
+        FROM branch B 
+        LEFT JOIN employee E ON B.branch_id = E.branch_id 
+        LEFT JOIN account A ON B.branch_id = A.branch_id 
+        GROUP BY B.branch_name
+        HAVING COUNT(DISTINCT E.employee_id) > %s AND COUNT(DISTINCT A.account_id) >= %s;
+        """
+        cursor.execute(query, (min_employees, min_accounts))
+        branches = cursor.fetchall()
+        return branches
+
+    except Exception as e:
+        raise RuntimeError(f"Database query failed: {str(e)}")
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
+
+@branch_blueprint.route('/branches_with_conditions', methods=['GET'])
+@admin_required
+def api_branches_with_conditions():
+    """
+    API endpoint to fetch branches with a minimum number of employees and accounts.
+    """
+    try:
+        min_employees = request.args.get('min_employees', default=5, type=int)
+        min_accounts = request.args.get('min_accounts', default=3, type=int)
+
+        if min_employees < 0 or min_accounts < 0:
+            return jsonify({'error': 'Minimum values must be non-negative integers.'}), 400
+
+        results = get_branches_with_conditions(min_employees, min_accounts)
+
+        if not results:
+            return jsonify({'message': 'No branches found matching the specified criteria.'}), 404
+
+        return jsonify(results), 200
+
+    except RuntimeError as e:
+        return jsonify({'error': str(e)}), 500
+
+    except Exception as e:
+        return jsonify({'error': 'An unexpected error occurred.', 'details': str(e)}), 500
