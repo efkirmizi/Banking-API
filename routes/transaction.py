@@ -74,7 +74,7 @@ def create_transaction():
 def get_transactions():
     try:
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         cursor.execute("SELECT * FROM transaction")
         transactions = cursor.fetchall()
         cursor.close()
@@ -91,7 +91,7 @@ def get_transactions():
 def get_account_transactions(account_id):
     try:
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         cursor.execute("""
         SELECT * FROM transaction 
         WHERE from_account_id = %s OR to_account_id = %s
@@ -111,7 +111,7 @@ def get_account_transactions(account_id):
 def get_transaction(transaction_id):
     try:
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         cursor.execute("SELECT * FROM transaction WHERE transaction_id = %s", (transaction_id,))
         transaction = cursor.fetchone()
         cursor.close()

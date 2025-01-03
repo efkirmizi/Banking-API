@@ -62,7 +62,7 @@ def create_branch():
 def get_branches():
     try:
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         cursor.execute("SELECT * FROM branch")
         branches = cursor.fetchall()
         cursor.close()
@@ -79,7 +79,7 @@ def get_branches():
 def get_branch(branch_id):
     try:
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         cursor.execute("SELECT * FROM branch WHERE branch_id = %s", (branch_id,))
         branch = cursor.fetchone()
         cursor.close()

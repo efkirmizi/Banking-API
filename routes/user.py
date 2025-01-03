@@ -8,7 +8,6 @@ user_blueprint = Blueprint('user', __name__)
 
 # create a new user
 @user_blueprint.route('/users', methods=['POST'])
-@admin_required
 def create_user():
     data = request.get_json()
     try:
@@ -25,7 +24,7 @@ def create_user():
 
         hashed_password = generate_password_hash(password)
         user_id = str(uuid.uuid4())
-
+        
         connection = get_db_connection()
         cursor = connection.cursor()
         cursor.execute(

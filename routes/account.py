@@ -69,7 +69,7 @@ def create_account():
 def get_accounts():
   try:
     connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
+    cursor = connection.cursor()
     cursor.execute("SELECT * FROM account")
     accounts = cursor.fetchall()
     cursor.close()
@@ -86,7 +86,7 @@ def get_accounts():
 def get_account(account_id):
   try:
     connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
+    cursor = connection.cursor()
     cursor.execute("SELECT * FROM account WHERE account_id = %s", (account_id,))
     account = cursor.fetchone()
     cursor.close()

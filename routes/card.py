@@ -72,7 +72,7 @@ def create_card():
 def get_cards():
     try:
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         cursor.execute("SELECT * FROM card")
         cards = cursor.fetchall()
         cursor.close()
@@ -89,7 +89,7 @@ def get_cards():
 def get_card(card_id):
     try:
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         cursor.execute("SELECT * FROM card WHERE card_id = %s", (card_id,))
         card = cursor.fetchone()
         cursor.close()

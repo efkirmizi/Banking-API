@@ -66,7 +66,7 @@ def create_customer():
 def get_customers():
     try:
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         cursor.execute("SELECT * FROM customer")
         customers = cursor.fetchall()
         cursor.close()
@@ -83,7 +83,7 @@ def get_customers():
 def get_customer(customer_id):
     try:
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         cursor.execute("SELECT * FROM customer WHERE customer_id = %s", (customer_id,))
         customer = cursor.fetchone()
         cursor.close()

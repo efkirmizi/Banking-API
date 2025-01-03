@@ -34,7 +34,7 @@ def init_db():
         CREATE TABLE IF NOT EXISTS user (
             user_id CHAR(36) PRIMARY KEY,
             username VARCHAR(100) UNIQUE NOT NULL,
-            password VARCHAR(100) NOT NULL,
+            password VARCHAR(255) NOT NULL,
             role ENUM('ADMIN', 'USER') NOT NULL DEFAULT 'USER',
             customer_id CHAR(36),
             FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON UPDATE CASCADE ON DELETE RESTRICT

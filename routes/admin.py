@@ -1,20 +1,23 @@
 from flask import Blueprint, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import get_jwt, verify_jwt_in_request
 from functools import wraps
 
 admin_blueprint = Blueprint('admin', __name__)
 
-def admin_required(func):
-    @wraps(func)
-    @jwt_required()
+def admin_required(fn):
+    @wraps(fn)
     def wrapper(*args, **kwargs):
-        current_user = get_jwt_identity()
-        if not current_user or current_user.get("role") != "ADMIN":
-            return jsonify({"error": "Admin access required"}), 403
-        return func(*args, **kwargs)
+        verify_jwt_in_request()
+        claims = get_jwt()
+        
+        if claims.get('role', None) == "ADMIN":
+            return fn(*args, **kwargs)
+        
+        return jsonify({"msg": "Admins only! Access forbidden."}), 403
+    
     return wrapper
 
-@admin_blueprint.route('/admin/dashboard', methods=['GET'])
+@admin_blueprint.route('/dashboard', methods=['GET'])
 @admin_required
 def admin_dashboard():
     return jsonify({"message": "Welcome to the admin dashboard!"}), 200

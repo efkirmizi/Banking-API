@@ -73,7 +73,7 @@ def create_loan():
 def get_loans():
     try:
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         cursor.execute("SELECT * FROM loan")
         loans = cursor.fetchall()
         cursor.close()
@@ -90,7 +90,7 @@ def get_loans():
 def get_loan(loan_id):
     try:
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         cursor.execute("SELECT * FROM loan WHERE loan_id = %s", (loan_id,))
         loan = cursor.fetchone()
         cursor.close()

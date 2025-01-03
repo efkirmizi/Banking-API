@@ -66,7 +66,7 @@ def create_employee():
 def get_employees():
     try:
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         cursor.execute("SELECT * FROM employee")
         employees = cursor.fetchall()
         cursor.close()
@@ -83,7 +83,7 @@ def get_employees():
 def get_employee(employee_id):
     try:
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         cursor.execute("SELECT * FROM employee WHERE employee_id = %s", (employee_id,))
         employee = cursor.fetchone()
         cursor.close()

@@ -75,7 +75,7 @@ def create_loan_payment():
 def get_loan_payments():
     try:
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         cursor.execute("SELECT * FROM loan_payment")
         loan_payments = cursor.fetchall()
         cursor.close()
@@ -92,7 +92,7 @@ def get_loan_payments():
 def get_loan_payments_by_loan(loan_id):
     try:
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         cursor.execute("SELECT * FROM loan_payment WHERE loan_id = %s", (loan_id,))
         loan_payments = cursor.fetchall()
         cursor.close()
@@ -109,7 +109,7 @@ def get_loan_payments_by_loan(loan_id):
 def get_loan_payment(loan_payment_id):
     try:
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         cursor.execute("SELECT * FROM loan_payment WHERE loan_payment_id = %s", (loan_payment_id,))
         loan_payment = cursor.fetchone()
         cursor.close()

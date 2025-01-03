@@ -63,7 +63,7 @@ def create_ticket():
 def get_tickets():
     try:
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         cursor.execute("SELECT * FROM customer_support")
         tickets = cursor.fetchall()
         cursor.close()
@@ -80,7 +80,7 @@ def get_tickets():
 def get_ticket(ticket_id):
     try:
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         cursor.execute("SELECT * FROM customer_support WHERE ticket_id = %s", (ticket_id,))
         ticket = cursor.fetchone()
         cursor.close()

@@ -62,7 +62,7 @@ def create_credit_score():
 def get_credit_scores():
     try:
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         cursor.execute("SELECT * FROM credit_score")
         credit_scores = cursor.fetchall()
         cursor.close()
@@ -79,7 +79,7 @@ def get_credit_scores():
 def get_credit_score(credit_score_id):
     try:
         connection = get_db_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         cursor.execute("SELECT * FROM credit_score WHERE credit_score_id = %s", (credit_score_id,))
         credit_score = cursor.fetchone()
         cursor.close()
