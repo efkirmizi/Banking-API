@@ -127,13 +127,13 @@ def update_branch(branch_id):
         if not updates:
             return jsonify({"error": "No valid fields to update"}), 400
 
-        # Add branch_id to the end of the params list
-        params.append(branch_id)
-
-        # Construct the SQL UPDATE query
+        # Construct the SQL UPDATE query with a placeholder for the WHERE clause
         query = f"UPDATE branch SET {', '.join(updates)} WHERE branch_id = %s"
 
+        # Add branch_id to the end of the params list
+        params.append(branch_id)
         # Execute the query and commit changes
+        
         cursor.execute(query, tuple(params))
         connection.commit()
 

@@ -85,6 +85,11 @@ def get_accounts():
 @admin_required
 def get_account(account_id):
   try:
+    try:
+      uuid.UUID(account_id)
+    except ValueError:
+      return jsonify({'error': 'Invalid UUID string for account_id'})
+    
     connection = get_db_connection()
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM account WHERE account_id = %s", (account_id,))
@@ -106,6 +111,11 @@ def get_account(account_id):
 def update_account_balance(account_id):
   data = request.get_json()
   try:
+    try:
+      uuid.UUID(account_id)
+    except ValueError:
+      return jsonify({'error': 'Invalid UUID string for account_id'})
+
     if 'amount' not in data:
       return jsonify({"error": "Amount is required"}), 400
 
@@ -146,6 +156,11 @@ def update_account_balance(account_id):
 @admin_required
 def delete_account(account_id):
     try:
+      try:
+        uuid.UUID(account_id)
+      except ValueError:
+       return jsonify({'error': 'Invalid UUID string for account_id'})
+
       connection = get_db_connection()
       cursor = connection.cursor()
       cursor.execute("DELETE FROM account WHERE account_id = %s", (account_id,))

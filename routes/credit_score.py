@@ -78,6 +78,11 @@ def get_credit_scores():
 @admin_required
 def get_credit_score(credit_score_id):
     try:
+        try:
+            uuid.UUID(credit_score_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid credit_score_id'})
+
         connection = get_db_connection()
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM credit_score WHERE credit_score_id = %s", (credit_score_id,))
@@ -99,6 +104,11 @@ def get_credit_score(credit_score_id):
 def update_credit_score(credit_score_id):
     data = request.get_json()
     try:
+        try:
+            uuid.UUID(credit_score_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid credit_score_id'})
+
         connection = get_db_connection()
         cursor = connection.cursor()
 
@@ -146,6 +156,11 @@ def update_credit_score(credit_score_id):
 @admin_required
 def delete_credit_score(credit_score_id):
     try:
+        try:
+            uuid.UUID(credit_score_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid credit_score_id'})
+
         connection = get_db_connection()
         cursor = connection.cursor()
         cursor.execute("DELETE FROM credit_score WHERE credit_score_id = %s", (credit_score_id,))

@@ -19,6 +19,11 @@ def create_loan_payment():
         if missing_fields:
             raise BadRequest(f"Missing required fields: {', '.join(missing_fields)}")
 
+        try:
+            uuid.UUID(data['loan_id'])
+        except ValueError:
+            return jsonify({'error': 'Invalid UUID string for loan_id'})
+
         # Get current date and time
         payment_date = datetime.now()
 
@@ -91,6 +96,11 @@ def get_loan_payments():
 @admin_required
 def get_loan_payments_by_loan(loan_id):
     try:
+        try:
+            uuid.UUID(loan_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid UUID string for loan_id'})
+
         connection = get_db_connection()
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM loan_payment WHERE loan_id = %s", (loan_id,))
@@ -108,6 +118,11 @@ def get_loan_payments_by_loan(loan_id):
 @admin_required
 def get_loan_payment(loan_payment_id):
     try:
+        try:
+            uuid.UUID(loan_payment_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid UUID string for loan_id'})
+
         connection = get_db_connection()
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM loan_payment WHERE loan_payment_id = %s", (loan_payment_id,))
@@ -134,6 +149,11 @@ def get_loan_payment(loan_payment_id):
 @admin_required
 def delete_loan_payment(loan_payment_id):
     try:
+        try:
+            uuid.UUID(loan_payment_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid UUID string for loan_id'})
+
         connection = get_db_connection()
         cursor = connection.cursor()
         cursor.execute("DELETE FROM loan_payment WHERE loan_payment_id = %s", (loan_payment_id,))

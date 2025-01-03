@@ -4,6 +4,7 @@ import uuid
 from datetime import date
 from database import get_db_connection
 from .admin import admin_required
+import re
 
 card_blueprint = Blueprint('card', __name__)
 
@@ -37,6 +38,9 @@ def create_card():
         connection = get_db_connection()
         cursor = connection.cursor()
 
+        card_number = data['card_number']
+        sanitized_card_number = re.sub(r"[^0-9-]", "", card_number) 
+
         # Prepare SQL query
         query = """
         INSERT INTO card (card_id, account_id, card_type, card_number, expiration_date, cvv, status)
@@ -46,7 +50,7 @@ def create_card():
         card_id,
         data['account_id'],
         data['card_type'],
-        data['card_number'],
+        sanitized_card_number,
         expiration_date,
         data['cvv'],
         )
@@ -88,6 +92,11 @@ def get_cards():
 @admin_required
 def get_card(card_id):
     try:
+        try:
+            uuid.UUID(card_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid card_id'})
+
         connection = get_db_connection()
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM card WHERE card_id = %s", (card_id,))
@@ -109,6 +118,11 @@ def get_card(card_id):
 def update_card_status(card_id):
     data = request.get_json()
     try:
+        try:
+            uuid.UUID(card_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid card_id'})
+
         if 'status' not in data:
             return jsonify({"error": "Status is required"}), 400
 
@@ -138,6 +152,11 @@ def update_card_status(card_id):
 @admin_required
 def delete_card(card_id):
     try:
+        try:
+            uuid.UUID(card_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid card_id'})
+
         connection = get_db_connection()
         cursor = connection.cursor()
         cursor.execute("DELETE FROM card WHERE card_id = %s", (card_id,))

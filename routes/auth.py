@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
 from werkzeug.security import check_password_hash
 from database import get_db_connection
+import re
 
 auth_blueprint = Blueprint('auth', __name__)
 
@@ -14,6 +15,10 @@ def login():
 
     if not username or not password:
         return jsonify({"error": "Username and password are required"}), 400
+
+    # Sanitize username to prevent SQL injection
+    # Example using regex to allow only alphanumeric characters and underscores
+    username = re.sub(r"[^a-zA-Z0-9_]", "", username) 
 
     # Connect to the database
     connection = get_db_connection()

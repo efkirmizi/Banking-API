@@ -19,6 +19,12 @@ def create_ticket():
         if missing_fields:
             raise BadRequest(f"Missing required fields: {', '.join(missing_fields)}")
 
+        try:
+            uuid.UUID(data['customer_id'])
+            uuid.UUID(data['employee_id'])
+        except ValueError:
+            return jsonify({'error': 'Invalid UUID for customer_id or employee_id'})
+
         # Get current date and time
         created_date = datetime.now()
 
@@ -79,6 +85,11 @@ def get_tickets():
 @admin_required
 def get_ticket(ticket_id):
     try:
+        try:
+            uuid.UUID(ticket_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid UUID string for ticket_id'})
+
         connection = get_db_connection()
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM customer_support WHERE ticket_id = %s", (ticket_id,))
@@ -100,6 +111,11 @@ def get_ticket(ticket_id):
 def update_ticket_status(ticket_id):
     data = request.get_json()
     try:
+        try:
+            uuid.UUID(ticket_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid UUID string for ticket_id'})
+
         if 'status' not in data:
             return jsonify({"error": "Status is required"}), 400
 
@@ -139,6 +155,11 @@ def update_ticket_status(ticket_id):
 @admin_required
 def delete_ticket(ticket_id):
     try:
+        try:
+            uuid.UUID(ticket_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid UUID string for ticket_id'})
+
         connection = get_db_connection()
         cursor = connection.cursor()
         cursor.execute("DELETE FROM customer_support WHERE ticket_id = %s", (ticket_id,))

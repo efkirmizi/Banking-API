@@ -82,6 +82,11 @@ def get_customers():
 @admin_required
 def get_customer(customer_id):
     try:
+        try:
+            uuid.UUID(customer_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid UUID string for customer_id'})
+
         connection = get_db_connection()
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM customer WHERE customer_id = %s", (customer_id,))
@@ -103,6 +108,11 @@ def get_customer(customer_id):
 def update_customer(customer_id):
     data = request.get_json()
     try:
+        try:
+            uuid.UUID(customer_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid UUID string for customer_id'})
+
         connection = get_db_connection()
         cursor = connection.cursor()
 
@@ -171,6 +181,11 @@ def update_customer(customer_id):
 @admin_required
 def delete_customer(customer_id):
     try:
+        try:
+            uuid.UUID(customer_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid UUID string for customer_id'})
+
         connection = get_db_connection()
         cursor = connection.cursor()
         cursor.execute("DELETE FROM customer WHERE customer_id = %s", (customer_id,))

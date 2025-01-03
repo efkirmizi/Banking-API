@@ -19,6 +19,12 @@ def create_loan():
         if missing_fields:
             raise BadRequest(f"Missing required fields: {', '.join(missing_fields)}")
 
+        # Validate customer_id
+        try:
+            uuid.UUID(data['customer_id'])
+        except ValueError:
+            return jsonify({'error': 'Invalid UUID string for customer_id'})
+
         # Validate loan type
         valid_loan_types = ['HOME', 'AUTO', 'PERSONAL']
         if data['loan_type'] not in valid_loan_types:
@@ -89,6 +95,11 @@ def get_loans():
 @admin_required
 def get_loan(loan_id):
     try:
+        try:
+            uuid.UUID(loan_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid UUID string for loan_id'})
+
         connection = get_db_connection()
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM loan WHERE loan_id = %s", (loan_id,))
@@ -110,6 +121,11 @@ def get_loan(loan_id):
 def update_loan_status(loan_id):
     data = request.get_json()
     try:
+        try:
+            uuid.UUID(loan_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid UUID string for loan_id'})
+
         if 'status' not in data:
             return jsonify({"error": "Status is required"}), 400
 
@@ -139,6 +155,11 @@ def update_loan_status(loan_id):
 @admin_required
 def delete_loan(loan_id):
     try:
+        try:
+            uuid.UUID(loan_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid UUID string for loan_id'})
+
         connection = get_db_connection()
         cursor = connection.cursor()
         cursor.execute("DELETE FROM loan WHERE loan_id = %s", (loan_id,))

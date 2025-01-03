@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 from database import get_db_connection
 from .admin import admin_required
-from flask_jwt_extended import get_jwt, jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 transaction_blueprint = Blueprint('transaction', __name__)
 
@@ -91,6 +91,11 @@ def get_transactions():
 @admin_required
 def get_account_transactions(account_id):
     try:
+        try:
+            uuid.UUID(account_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid UUID string for account_id'})
+
         connection = get_db_connection()
         cursor = connection.cursor()
         cursor.execute("""
@@ -111,6 +116,11 @@ def get_account_transactions(account_id):
 @admin_required
 def get_transaction(transaction_id):
     try:
+        try:
+            uuid.UUID(transaction_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid UUID string for transaction_id'})
+
         connection = get_db_connection()
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM transaction WHERE transaction_id = %s", (transaction_id,))
@@ -131,6 +141,11 @@ def get_transaction(transaction_id):
 @admin_required
 def delete_transaction(transaction_id):
     try:
+        try:
+            uuid.UUID(transaction_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid UUID string for transaction_id'})
+
         connection = get_db_connection()
         cursor = connection.cursor()
         cursor.execute("DELETE FROM transaction WHERE transaction_id = %s", (transaction_id,))

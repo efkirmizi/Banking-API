@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from werkzeug.exceptions import BadRequest
-import uuid
+import uuid, re
 from datetime import datetime
 from database import get_db_connection
 from .admin import admin_required
@@ -18,7 +18,16 @@ def create_employee():
         missing_fields = [field for field in required_fields if field not in data]
         if missing_fields:
             raise BadRequest(f"Missing required fields: {', '.join(missing_fields)}")
+        
+        try:
+            uuid.UUID(data['branch_id'])
+        except ValueError:
+            return jsonify({'error': 'Invalid UUID string for branch_id'})
 
+        # Validate email format
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", data['email']):
+            raise BadRequest("Invalid email format.")
+        
         # Generate unique employee ID
         employee_id = str(uuid.uuid4())
 
@@ -82,6 +91,11 @@ def get_employees():
 @admin_required
 def get_employee(employee_id):
     try:
+        try:
+            uuid.UUID(employee_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid UUID string for employee_id'})
+
         connection = get_db_connection()
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM employee WHERE employee_id = %s", (employee_id,))
@@ -103,6 +117,11 @@ def get_employee(employee_id):
 def update_employee(employee_id):
     data = request.get_json()
     try:
+        try:
+            uuid.UUID(employee_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid UUID string for employee_id'})
+
         connection = get_db_connection()
         cursor = connection.cursor()
 
@@ -162,6 +181,11 @@ def update_employee(employee_id):
 @admin_required
 def delete_employee(employee_id):
     try:
+        try:
+            uuid.UUID(employee_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid UUID string for employee_id'})
+
         connection = get_db_connection()
         cursor = connection.cursor()
         cursor.execute("DELETE FROM employee WHERE employee_id = %s", (employee_id,))
