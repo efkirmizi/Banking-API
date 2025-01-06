@@ -10,6 +10,69 @@ customer_blueprint = Blueprint('customer', __name__)
 @customer_blueprint.route('/customers', methods=['POST'])
 @admin_required
 def create_customer():
+    """
+    Create a new customer
+    ---
+    tags:
+      - Customers
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            first_name:
+              type: string
+              example: faruk
+            last_name:
+              type: string
+              example: oz
+            date_of_birth:
+              type: string
+              format: date
+              example: 1990-01-01
+            phone_number:
+              type: string
+              example: 1234567890
+            email:
+              type: string
+              example: deneme@example.com
+            address_line1:
+              type: string
+              example: katar cd.
+            address_line2:
+              type: string
+              example: Apartment 4
+              nullable: true
+            city:
+              type: string
+              example: istanbul
+            zip_code:
+              type: string
+              example: 54321
+            wage_declaration:
+              type: number
+              example: 50000.00
+              nullable: true
+    responses:
+      201:
+        description: Customer created successfully
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Customer created successfully
+            customer_id:
+              type: string
+              example: 123e4567-e89b-12d3-a456-426614174000
+      400:
+        description: Validation error
+      500:
+        description: Internal server error
+    """
+
     data = request.get_json()
     try:
         # Validate required fields
@@ -64,6 +127,56 @@ def create_customer():
 @customer_blueprint.route('/customers', methods=['GET'])
 @admin_required
 def get_customers():
+    """
+    Get all customers
+    ---
+    tags:
+      - Customers
+    responses:
+      200:
+        description: List of all customers
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              customer_id:
+                type: string
+                example: 123e4567-e89b-12d3-a456-426614174000
+              first_name:
+                type: string
+                example: faruk
+              last_name:
+                type: string
+                example: oz
+              date_of_birth:
+                type: string
+                example: 1990-01-01
+              phone_number:
+                type: string
+                example: 1234567890
+              email:
+                type: string
+                example: deneme@example.com
+              address_line1:
+                type: string
+                example: katar cd
+              address_line2:
+                type: string
+                example: Apartment 4
+              city:
+                type: string
+                example: istanbul
+              zip_code:
+                type: string
+                example: 54321
+              wage_declaration:
+                type: number
+                example: 50000.00
+      500:
+        description: Internal server error
+    """
+
     try:
         connection = get_db_connection()
         cursor = connection.cursor()
@@ -81,6 +194,62 @@ def get_customers():
 @customer_blueprint.route('/customers/<customer_id>', methods=['GET'])
 @admin_required
 def get_customer(customer_id):
+    """
+    Get a specific customer by ID
+    ---
+    tags:
+      - Customers
+    parameters:
+      - name: customer_id
+        in: path
+        required: true
+        type: string
+        example: 123e4567-e89b-12d3-a456-426614174000
+    responses:
+      200:
+        description: Customer details
+        schema:
+          type: object
+          properties:
+            customer_id:
+              type: string
+              example: 123e4567-e89b-12d3-a456-426614174000
+            first_name:
+              type: string
+              example: faruk
+            last_name:
+              type: string
+              example: oz
+            date_of_birth:
+              type: string
+              example: 1990-01-01
+            phone_number:
+              type: string
+              example: 1234567890
+            email:
+              type: string
+              example: deneme@example.com
+            address_line1:
+              type: string
+              example: katar cd
+            address_line2:
+              type: string
+              example: Apartment 4
+            city:
+              type: string
+              example: istanbul
+            zip_code:
+              type: string
+              example: 54321
+            wage_declaration:
+              type: number
+              example: 50000.00
+      404:
+        description: Customer not found
+      500:
+        description: Internal server error
+    """
+
     try:
         try:
             uuid.UUID(customer_id)
@@ -106,6 +275,71 @@ def get_customer(customer_id):
 @customer_blueprint.route('/customers/<customer_id>', methods=['PUT'])
 @admin_required
 def update_customer(customer_id):
+    """
+    Update a customer's details
+    ---
+    tags:
+      - Customers
+    parameters:
+      - name: customer_id
+        in: path
+        required: true
+        type: string
+        example: 123e4567-e89b-12d3-a456-426614174000
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            first_name:
+              type: string
+              example: jale
+            last_name:
+              type: string
+              example: korkmaz
+            date_of_birth:
+              type: string
+              format: date
+              example: 1985-05-15
+            phone_number:
+              type: string
+              example: 9876543210
+            email:
+              type: string
+              example: jale@example.com
+            address_line1:
+              type: string
+              example: sehitler cd
+            address_line2:
+              type: string
+              example: no 2
+            city:
+              type: string
+              example: izmir
+            zip_code:
+              type: string
+              example: 67890
+            wage_declaration:
+              type: number
+              example: 60000.00
+    responses:
+      200:
+        description: Customer updated successfully
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Customer updated successfully
+      400:
+        description: Validation error
+      404:
+        description: Customer not found
+      500:
+        description: Internal server error
+    """
+
     data = request.get_json()
     try:
         try:
@@ -180,6 +414,32 @@ def update_customer(customer_id):
 @customer_blueprint.route('/customers/<customer_id>', methods=['DELETE'])
 @admin_required
 def delete_customer(customer_id):
+    """
+    Delete a customer
+    ---
+    tags:
+      - Customers
+    parameters:
+      - name: customer_id
+        in: path
+        required: true
+        type: string
+        example: 123e4567-e89b-12d3-a456-426614174000
+    responses:
+      200:
+        description: Customer deleted successfully
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Customer deleted successfully
+      404:
+        description: Customer not found
+      500:
+        description: Internal server error
+    """
+
     try:
         try:
             uuid.UUID(customer_id)

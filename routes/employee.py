@@ -11,6 +11,58 @@ employee_blueprint = Blueprint('employee', __name__)
 @employee_blueprint.route('/employees', methods=['POST'])
 @admin_required
 def create_employee():
+    """
+    Create a new employee
+    ---
+    tags:
+      - Employees
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            branch_id:
+              type: string
+              example: 123e4567-e89b-12d3-a456-426614174003
+            first_name:
+              type: string
+              example: hazar
+            last_name:
+              type: string
+              example: sozer
+            position:
+              type: string
+              example: Manager
+            hire_date:
+              type: string
+              format: date
+              example: 2024-01-01
+            phone_number:
+              type: string
+              example: 1234567890
+            email:
+              type: string
+              example: sozer@example.com
+    responses:
+      201:
+        description: Employee created successfully
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Employee created successfully
+            employee_id:
+              type: string
+              example: 123e4567-e89b-12d3-a456-426614174004
+      400:
+        description: Validation error
+      500:
+        description: Internal server error
+    """
+
     data = request.get_json()
     try:
         # Validate required fields
@@ -73,6 +125,47 @@ def create_employee():
 @employee_blueprint.route('/employees', methods=['GET'])
 @admin_required
 def get_employees():
+    """
+    Get all employees
+    ---
+    tags:
+      - Employees
+    responses:
+      200:
+        description: List of all employees
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              employee_id:
+                type: string
+                example: 123e4567-e89b-12d3-a456-426614174004
+              branch_id:
+                type: string
+                example: 123e4567-e89b-12d3-a456-426614174003
+              first_name:
+                type: string
+                example: talha
+              last_name:
+                type: string
+                example: ucar
+              position:
+                type: string
+                example: Manager
+              hire_date:
+                type: string
+                example: 2024-01-01
+              phone_number:
+                type: string
+                example: 1234567890
+              email:
+                type: string
+                example: talha@example.com
+      500:
+        description: Internal server error
+    """
+
     try:
         connection = get_db_connection()
         cursor = connection.cursor()
@@ -90,6 +183,53 @@ def get_employees():
 @employee_blueprint.route('/employees/<employee_id>', methods=['GET'])
 @admin_required
 def get_employee(employee_id):
+    """
+    Get a specific employee by ID
+    ---
+    tags:
+      - Employees
+    parameters:
+      - name: employee_id
+        in: path
+        required: true
+        type: string
+        example: 123e4567-e89b-12d3-a456-426614174004
+    responses:
+      200:
+        description: Employee details
+        schema:
+          type: object
+          properties:
+            employee_id:
+              type: string
+              example: 123e4567-e89b-12d3-a456-426614174004
+            branch_id:
+              type: string
+              example: 123e4567-e89b-12d3-a456-426614174003
+            first_name:
+              type: string
+              example: ece
+            last_name:
+              type: string
+              example: ada
+            position:
+              type: string
+              example: Manager
+            hire_date:
+              type: string
+              example: 2024-01-01
+            phone_number:
+              type: string
+              example: 1234567890
+            email:
+              type: string
+              example: ece@example.com
+      404:
+        description: Employee not found
+      500:
+        description: Internal server error
+    """
+
     try:
         try:
             uuid.UUID(employee_id)
@@ -115,6 +255,62 @@ def get_employee(employee_id):
 @employee_blueprint.route('/employees/<employee_id>', methods=['PUT'])
 @admin_required
 def update_employee(employee_id):
+    """
+    Update an employee's details
+    ---
+    tags:
+      - Employees
+    parameters:
+      - name: employee_id
+        in: path
+        required: true
+        type: string
+        example: 123e4567-e89b-12d3-a456-426614174004
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            branch_id:
+              type: string
+              example: 123e4567-e89b-12d3-a456-426614174003
+            first_name:
+              type: string
+              example: belinay
+            last_name:
+              type: string
+              example: caliskan
+            position:
+              type: string
+              example: Assistant Manager
+            hire_date:
+              type: string
+              format: date
+              example: 2025-01-01
+            phone_number:
+              type: string
+              example: 9876543210
+            email:
+              type: string
+              example: caliskan@example.com
+    responses:
+      200:
+        description: Employee updated successfully
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Employee updated successfully
+      400:
+        description: Validation error
+      404:
+        description: Employee not found
+      500:
+        description: Internal server error
+    """
+
     data = request.get_json()
     try:
         try:
@@ -180,6 +376,32 @@ def update_employee(employee_id):
 @employee_blueprint.route('/employees/<employee_id>', methods=['DELETE'])
 @admin_required
 def delete_employee(employee_id):
+    """
+    Delete an employee
+    ---
+    tags:
+      - Employees
+    parameters:
+      - name: employee_id
+        in: path
+        required: true
+        type: string
+        example: 123e4567-e89b-12d3-a456-426614174004
+    responses:
+      200:
+        description: Employee deleted successfully
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Employee deleted successfully
+      404:
+        description: Employee not found
+      500:
+        description: Internal server error
+    """
+
     try:
         try:
             uuid.UUID(employee_id)

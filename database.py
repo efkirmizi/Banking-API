@@ -71,7 +71,7 @@ def init_db():
             start_date DATE NOT NULL,
             end_date DATE NOT NULL,
             status ENUM('ACTIVE', 'PAID_OFF', 'DEFAULT') NOT NULL,
-            FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON UPDATE CASCADE ON DELETE RESTRICT,
+            FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON UPDATE CASCADE ON DELETE SET NULL,
             CONSTRAINT check_principal_positive CHECK (principal_amount > 0),
             CONSTRAINT check_interest_non_negative CHECK (interest_rate >= 0),
             CONSTRAINT check_dates_valid CHECK (start_date < end_date)
@@ -83,7 +83,7 @@ def init_db():
             payment_date DATETIME NOT NULL,
             payment_amount DECIMAL(15, 2) NOT NULL,
             remaining_balance DECIMAL(15, 2),
-            FOREIGN KEY (loan_id) REFERENCES loan(loan_id) ON UPDATE CASCADE ON DELETE RESTRICT,
+            FOREIGN KEY (loan_id) REFERENCES loan(loan_id) ON UPDATE CASCADE ON DELETE SET NULL,
             CONSTRAINT check_payment_positive CHECK (payment_amount > 0),
             CONSTRAINT check_remaining_non_negative CHECK (remaining_balance >= 0)
         );''')

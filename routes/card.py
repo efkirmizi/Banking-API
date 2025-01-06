@@ -12,6 +12,55 @@ card_blueprint = Blueprint('card', __name__)
 @card_blueprint.route('/cards', methods=['POST'])
 @admin_required
 def create_card():
+    """
+    Create a new card
+    ---
+    tags:
+      - Cards
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            account_id:
+              type: string
+              example: 123e4567-e89b-12d3-a456-426614174000
+            card_type:
+              type: string
+              example: DEBIT
+              enum: [DEBIT, CREDIT]
+            card_number:
+              type: string
+              example: 1234-5678-9012-3456
+            expiration_date:
+              type: string
+              format: date
+              example: 2025-12-31
+            cvv:
+              type: string
+              example: 123
+    responses:
+      201:
+        description: Card created successfully
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Card created successfully
+            card_id:
+              type: string
+              example: 123e4567-e89b-12d3-a456-426614174001
+      400:
+        description: Validation error
+      500:
+        description: Internal server error
+    """
+
     data = request.get_json()
     try:
         # Validate required fields
@@ -74,6 +123,44 @@ def create_card():
 @card_blueprint.route('/cards', methods=['GET'])
 @admin_required
 def get_cards():
+    """
+    Get all cards
+    ---
+    tags:
+      - Cards
+    responses:
+      200:
+        description: List of all cards
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              card_id:
+                type: string
+                example: 123e4567-e89b-12d3-a456-426614174001
+              account_id:
+                type: string
+                example: 123e4567-e89b-12d3-a456-426614174000
+              card_type:
+                type: string
+                example: DEBIT
+              card_number:
+                type: string
+                example: 1234-5678-9012-3456
+              expiration_date:
+                type: string
+                example: 2025-12-31
+              cvv:
+                type: string
+                example: 123
+              status:
+                type: string
+                example: ACTIVE
+      500:
+        description: Internal server error
+    """
+
     try:
         connection = get_db_connection()
         cursor = connection.cursor()
@@ -91,6 +178,50 @@ def get_cards():
 @card_blueprint.route('/cards/<card_id>', methods=['GET'])
 @admin_required
 def get_card(card_id):
+    """
+    Get a specific card by ID
+    ---
+    tags:
+      - Cards
+    parameters:
+      - name: card_id
+        in: path
+        required: true
+        type: string
+        example: 123e4567-e89b-12d3-a456-426614174001
+    responses:
+      200:
+        description: Card details
+        schema:
+          type: object
+          properties:
+            card_id:
+              type: string
+              example: 123e4567-e89b-12d3-a456-426614174001
+            account_id:
+              type: string
+              example: 123e4567-e89b-12d3-a456-426614174000
+            card_type:
+              type: string
+              example: DEBIT
+            card_number:
+              type: string
+              example: 1234-5678-9012-3456
+            expiration_date:
+              type: string
+              example: 2025-12-31
+            cvv:
+              type: string
+              example: 123
+            status:
+              type: string
+              example: ACTIVE
+      404:
+        description: Card not found
+      500:
+        description: Internal server error
+    """
+
     try:
         try:
             uuid.UUID(card_id)
@@ -116,6 +247,44 @@ def get_card(card_id):
 @card_blueprint.route('/cards/<card_id>/status', methods=['PUT'])
 @admin_required
 def update_card_status(card_id):
+    """
+    Update the status of a card
+    ---
+    tags:
+      - Cards
+    parameters:
+      - name: card_id
+        in: path
+        required: true
+        type: string
+        example: 123e4567-e89b-12d3-a456-426614174001
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            status:
+              type: string
+              example: BLOCKED
+              enum: [ACTIVE, BLOCKED, EXPIRED]
+    responses:
+      200:
+        description: Card status updated successfully
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Card status updated successfully
+      400:
+        description: Validation error
+      404:
+        description: Card not found
+      500:
+        description: Internal server error
+    """
+
     data = request.get_json()
     try:
         try:
@@ -151,6 +320,32 @@ def update_card_status(card_id):
 @card_blueprint.route('/cards/<card_id>', methods=['DELETE'])
 @admin_required
 def delete_card(card_id):
+    """
+    Delete a card
+    ---
+    tags:
+      - Cards
+    parameters:
+      - name: card_id
+        in: path
+        required: true
+        type: string
+        example: 123e4567-e89b-12d3-a456-426614174001
+    responses:
+      200:
+        description: Card deleted successfully
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Card deleted successfully
+      404:
+        description: Card not found
+      500:
+        description: Internal server error
+    """
+
     try:
         try:
             uuid.UUID(card_id)

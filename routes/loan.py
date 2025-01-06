@@ -11,6 +11,59 @@ loan_blueprint = Blueprint('loan', __name__)
 @loan_blueprint.route('/loans', methods=['POST'])
 @admin_required
 def create_loan():
+    """
+    Create a new loan
+    ---
+    tags:
+      - Loans
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            customer_id:
+              type: string
+              example: 123e4567-e89b-12d3-a456-426614174000
+            loan_type:
+              type: string
+              enum: [HOME, AUTO, PERSONAL]
+              example: PERSONAL
+            principal_amount:
+              type: number
+              example: 50000.00
+            interest_rate:
+              type: number
+              example: 5.5
+            start_date:
+              type: string
+              format: date
+              example: 2024-01-01
+            end_date:
+              type: string
+              format: date
+              example: 2027-01-01
+    responses:
+      201:
+        description: Loan created successfully
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Loan created successfully
+            loan_id:
+              type: string
+              example: 123e4567-e89b-12d3-a456-426614174003
+      400:
+        description: Validation error
+      403:
+        description: Access forbidden (Admin only)
+      500:
+        description: Internal server error
+    """
+
     data = request.get_json()
     try:
         # Validate required fields
@@ -77,6 +130,51 @@ def create_loan():
 @loan_blueprint.route('/loans', methods=['GET'])
 @admin_required
 def get_loans():
+    """
+    Get all loans
+    ---
+    tags:
+      - Loans
+    responses:
+      200:
+        description: List of loans
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              loan_id:
+                type: string
+                example: 123e4567-e89b-12d3-a456-426614174003
+              customer_id:
+                type: string
+                example: 123e4567-e89b-12d3-a456-426614174000
+              loan_type:
+                type: string
+                example: PERSONAL
+              principal_amount:
+                type: number
+                example: 50000.00
+              interest_rate:
+                type: number
+                example: 5.5
+              start_date:
+                type: string
+                format: date
+                example: 2024-01-01
+              end_date:
+                type: string
+                format: date
+                example: 2027-01-01
+              status:
+                type: string
+                example: ACTIVE
+      403:
+        description: Access forbidden (Admin only)
+      500:
+        description: Internal server error
+    """
+
     try:
         connection = get_db_connection()
         cursor = connection.cursor()
@@ -94,6 +192,57 @@ def get_loans():
 @loan_blueprint.route('/loans/<loan_id>', methods=['GET'])
 @admin_required
 def get_loan(loan_id):
+    """
+    Get a specific loan by ID
+    ---
+    tags:
+      - Loans
+    parameters:
+      - name: loan_id
+        in: path
+        required: true
+        type: string
+        example: 123e4567-e89b-12d3-a456-426614174003
+    responses:
+      200:
+        description: Loan details
+        schema:
+          type: object
+          properties:
+            loan_id:
+              type: string
+              example: 123e4567-e89b-12d3-a456-426614174003
+            customer_id:
+              type: string
+              example: 123e4567-e89b-12d3-a456-426614174000
+            loan_type:
+              type: string
+              example: PERSONAL
+            principal_amount:
+              type: number
+              example: 50000.00
+            interest_rate:
+              type: number
+              example: 5.5
+            start_date:
+              type: string
+              format: date
+              example: 2024-01-01
+            end_date:
+              type: string
+              format: date
+              example: 2027-01-01
+            status:
+              type: string
+              example: ACTIVE
+      404:
+        description: Loan not found
+      403:
+        description: Access forbidden (Admin only)
+      500:
+        description: Internal server error
+    """
+
     try:
         try:
             uuid.UUID(loan_id)
@@ -119,6 +268,46 @@ def get_loan(loan_id):
 @loan_blueprint.route('/loans/<loan_id>/status', methods=['PUT'])
 @admin_required
 def update_loan_status(loan_id):
+    """
+    Update the status of a loan
+    ---
+    tags:
+      - Loans
+    parameters:
+      - name: loan_id
+        in: path
+        required: true
+        type: string
+        example: 123e4567-e89b-12d3-a456-426614174003
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            status:
+              type: string
+              enum: [ACTIVE, PAID_OFF, DEFAULT]
+              example: PAID_OFF
+    responses:
+      200:
+        description: Loan status updated successfully
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Loan status updated successfully
+      400:
+        description: Validation error
+      404:
+        description: Loan not found
+      403:
+        description: Access forbidden (Admin only)
+      500:
+        description: Internal server error
+    """
+
     data = request.get_json()
     try:
         try:
@@ -154,6 +343,34 @@ def update_loan_status(loan_id):
 @loan_blueprint.route('/loans/<loan_id>', methods=['DELETE'])
 @admin_required
 def delete_loan(loan_id):
+    """
+    Delete a loan
+    ---
+    tags:
+      - Loans
+    parameters:
+      - name: loan_id
+        in: path
+        required: true
+        type: string
+        example: 123e4567-e89b-12d3-a456-426614174003
+    responses:
+      200:
+        description: Loan deleted successfully
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Loan deleted successfully
+      404:
+        description: Loan not found
+      403:
+        description: Access forbidden (Admin only)
+      500:
+        description: Internal server error
+    """
+
     try:
         try:
             uuid.UUID(loan_id)

@@ -20,4 +20,28 @@ def admin_required(fn):
 @admin_blueprint.route('/dashboard', methods=['GET'])
 @admin_required
 def admin_dashboard():
+    """
+    Admin Dashboard
+    ---
+    tags:
+      - Admin
+    responses:
+      200:
+        description: Welcome message for the admin dashboard
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Welcome to the admin dashboard!
+      403:
+        description: Admin access required
+        schema:
+          type: object
+          properties:
+            msg:
+              type: string
+              example: Admins only! Access forbidden.
+    """
+
     return jsonify({"message": "Welcome to the admin dashboard!"}), 200

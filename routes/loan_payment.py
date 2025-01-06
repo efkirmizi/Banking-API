@@ -11,6 +11,50 @@ loan_payment_blueprint = Blueprint('loan_payment', __name__)
 @loan_payment_blueprint.route('/loan_payments', methods=['POST'])
 @admin_required
 def create_loan_payment():
+    """
+    Create a new loan payment
+    ---
+    tags:
+      - Loan Payments
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            loan_id:
+              type: string
+              example: "123e4567-e89b-12d3-a456-426614174003"
+            payment_amount:
+              type: number
+              example: 1000.50
+    responses:
+      201:
+        description: Loan payment recorded successfully
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Loan payment recorded successfully
+            loan_payment_id:
+              type: string
+              example: "123e4567-e89b-12d3-a456-426614174005"
+            remaining_balance:
+              type: number
+              example: 9000.50
+            payment_date:
+              type: string
+              example: "2025-01-06T12:00:00"
+      400:
+        description: Validation error
+      404:
+        description: Loan not found
+      500:
+        description: Internal server error
+    """
+
     data = request.get_json()
     try:
         # Validate required fields
@@ -34,7 +78,7 @@ def create_loan_payment():
         result = cursor.fetchone()
         if not result:
             return jsonify({"error": "Loan not found"}), 404
-        principal_amount = result[0]
+        principal_amount = result['principal_amount']
 
         # Calculate remaining balance
         remaining_balance = principal_amount - data['payment_amount']
@@ -78,6 +122,38 @@ def create_loan_payment():
 @loan_payment_blueprint.route('/loan_payments', methods=['GET'])
 @admin_required
 def get_loan_payments():
+    """
+    Get all loan payments
+    ---
+    tags:
+      - Loan Payments
+    responses:
+      200:
+        description: List of all loan payments
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              loan_payment_id:
+                type: string
+                example: 123e4567-e89b-12d3-a456-426614174005
+              loan_id:
+                type: string
+                example: 123e4567-e89b-12d3-a456-426614174003
+              payment_date:
+                type: string
+                example: 2024-01-05T12:00:00
+              payment_amount:
+                type: number
+                example: 1000.50
+              remaining_balance:
+                type: number
+                example: 9000.50
+      500:
+        description: Internal server error
+    """
+
     try:
         connection = get_db_connection()
         cursor = connection.cursor()
@@ -95,6 +171,46 @@ def get_loan_payments():
 @loan_payment_blueprint.route('/loans/<loan_id>/payments', methods=['GET'])
 @admin_required
 def get_loan_payments_by_loan(loan_id):
+    """
+    Get loan payments for a specific loan
+    ---
+    tags:
+      - Loan Payments
+    parameters:
+      - name: loan_id
+        in: path
+        required: true
+        type: string
+        example: 123e4567-e89b-12d3-a456-426614174003
+    responses:
+      200:
+        description: List of payments for the specified loan
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              loan_payment_id:
+                type: string
+                example: 123e4567-e89b-12d3-a456-426614174005
+              loan_id:
+                type: string
+                example: 123e4567-e89b-12d3-a456-426614174003
+              payment_date:
+                type: string
+                example: 2024-01-05T12:00:00
+              payment_amount:
+                type: number
+                example: 1000.50
+              remaining_balance:
+                type: number
+                example: 9000.50
+      404:
+        description: Loan not found
+      500:
+        description: Internal server error
+    """
+
     try:
         try:
             uuid.UUID(loan_id)
@@ -117,6 +233,44 @@ def get_loan_payments_by_loan(loan_id):
 @loan_payment_blueprint.route('/loan_payments/<loan_payment_id>', methods=['GET'])
 @admin_required
 def get_loan_payment(loan_payment_id):
+    """
+    Get a specific loan payment by ID
+    ---
+    tags:
+      - Loan Payments
+    parameters:
+      - name: loan_payment_id
+        in: path
+        required: true
+        type: string
+        example: 123e4567-e89b-12d3-a456-426614174005
+    responses:
+      200:
+        description: Loan payment details
+        schema:
+          type: object
+          properties:
+            loan_payment_id:
+              type: string
+              example: 123e4567-e89b-12d3-a456-426614174005
+            loan_id:
+              type: string
+              example: 123e4567-e89b-12d3-a456-426614174003
+            payment_date:
+              type: string
+              example: 2024-01-05T12:00:00
+            payment_amount:
+              type: number
+              example: 1000.50
+            remaining_balance:
+              type: number
+              example: 9000.50
+      404:
+        description: Loan payment not found
+      500:
+        description: Internal server error
+    """
+
     try:
         try:
             uuid.UUID(loan_payment_id)
@@ -148,6 +302,32 @@ def get_loan_payment(loan_payment_id):
 @loan_payment_blueprint.route('/loan_payments/<loan_payment_id>', methods=['DELETE'])
 @admin_required
 def delete_loan_payment(loan_payment_id):
+    """
+    Delete a loan payment
+    ---
+    tags:
+      - Loan Payments
+    parameters:
+      - name: loan_payment_id
+        in: path
+        required: true
+        type: string
+        example: 123e4567-e89b-12d3-a456-426614174005
+    responses:
+      200:
+        description: Loan payment deleted successfully
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Loan payment deleted successfully
+      404:
+        description: Loan payment not found
+      500:
+        description: Internal server error
+    """
+
     try:
         try:
             uuid.UUID(loan_payment_id)

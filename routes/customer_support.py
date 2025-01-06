@@ -11,6 +11,45 @@ customer_support_blueprint = Blueprint('customer_support', __name__)
 @customer_support_blueprint.route('/tickets', methods=['POST'])
 @admin_required
 def create_ticket():
+    """
+    Create a new support ticket
+    ---
+    tags:
+      - Customer Support
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            customer_id:
+              type: string
+              example: 123e4567-e89b-12d3-a456-426614174000
+            employee_id:
+              type: string
+              example: 123e4567-e89b-12d3-a456-426614174001
+            issue_description:
+              type: string
+              example: Customer is unable to access their account
+    responses:
+      201:
+        description: Ticket created successfully
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Ticket created successfully
+            ticket_id:
+              type: string
+              example: 123e4567-e89b-12d3-a456-426614174002
+      400:
+        description: Validation error
+      500:
+        description: Internal server error
+    """
+
     data = request.get_json()
     try:
         # Validate required fields
@@ -67,6 +106,45 @@ def create_ticket():
 @customer_support_blueprint.route('/tickets', methods=['GET'])
 @admin_required
 def get_tickets():
+    """
+    Get all support tickets
+    ---
+    tags:
+      - Customer Support
+    responses:
+      200:
+        description: List of all tickets
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              ticket_id:
+                type: string
+                example: 123e4567-e89b-12d3-a456-426614174002
+              customer_id:
+                type: string
+                example: 123e4567-e89b-12d3-a456-426614174000
+              employee_id:
+                type: string
+                example: 123e4567-e89b-12d3-a456-426614174001
+              issue_description:
+                type: string
+                example: Customer is unable to access their account
+              status:
+                type: string
+                example: OPEN
+              created_date:
+                type: string
+                example: 2024-01-05T12:00:00
+              resolved_date:
+                type: string
+                nullable: true
+                example: 2024-01-10T15:30:00
+      500:
+        description: Internal server error
+    """
+
     try:
         connection = get_db_connection()
         cursor = connection.cursor()
@@ -84,6 +162,51 @@ def get_tickets():
 @customer_support_blueprint.route('/tickets/<ticket_id>', methods=['GET'])
 @admin_required
 def get_ticket(ticket_id):
+    """
+    Get a specific support ticket by ID
+    ---
+    tags:
+      - Customer Support
+    parameters:
+      - name: ticket_id
+        in: path
+        required: true
+        type: string
+        example: 123e4567-e89b-12d3-a456-426614174002
+    responses:
+      200:
+        description: Ticket details
+        schema:
+          type: object
+          properties:
+            ticket_id:
+              type: string
+              example: 123e4567-e89b-12d3-a456-426614174002
+            customer_id:
+              type: string
+              example: 123e4567-e89b-12d3-a456-426614174000
+            employee_id:
+              type: string
+              example: 123e4567-e89b-12d3-a456-426614174001
+            issue_description:
+              type: string
+              example: Customer is unable to access their account
+            status:
+              type: string
+              example: RESOLVED
+            created_date:
+              type: string
+              example: 2024-01-05T12:00:00
+            resolved_date:
+              type: string
+              nullable: true
+              example: 2024-01-10T15:30:00
+      404:
+        description: Ticket not found
+      500:
+        description: Internal server error
+    """
+
     try:
         try:
             uuid.UUID(ticket_id)
@@ -109,6 +232,44 @@ def get_ticket(ticket_id):
 @customer_support_blueprint.route('/tickets/<ticket_id>/status', methods=['PUT'])
 @admin_required
 def update_ticket_status(ticket_id):
+    """
+    Update the status of a support ticket
+    ---
+    tags:
+      - Customer Support
+    parameters:
+      - name: ticket_id
+        in: path
+        required: true
+        type: string
+        example: 123e4567-e89b-12d3-a456-426614174002
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            status:
+              type: string
+              example: RESOLVED
+              enum: [OPEN, IN_PROGRESS, RESOLVED]
+    responses:
+      200:
+        description: Ticket status updated successfully
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Ticket status updated successfully
+      400:
+        description: Validation error (e.g., invalid status)
+      404:
+        description: Ticket not found
+      500:
+        description: Internal server error
+    """
+
     data = request.get_json()
     try:
         try:
@@ -154,6 +315,32 @@ def update_ticket_status(ticket_id):
 @customer_support_blueprint.route('/tickets/<ticket_id>', methods=['DELETE'])
 @admin_required
 def delete_ticket(ticket_id):
+    """
+    Delete a support ticket
+    ---
+    tags:
+      - Customer Support
+    parameters:
+      - name: ticket_id
+        in: path
+        required: true
+        type: string
+        example: 123e4567-e89b-12d3-a456-426614174002
+    responses:
+      200:
+        description: Ticket deleted successfully
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Ticket deleted successfully
+      404:
+        description: Ticket not found
+      500:
+        description: Internal server error
+    """
+
     try:
         try:
             uuid.UUID(ticket_id)

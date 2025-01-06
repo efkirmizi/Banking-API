@@ -10,6 +10,55 @@ branch_blueprint = Blueprint('branch', __name__)
 @branch_blueprint.route('/branches', methods=['POST'])
 @admin_required
 def create_branch():
+    """
+    Create a new branch
+    ---
+    tags:
+      - Branches
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            branch_name:
+              type: string
+              example: ITU Branch
+            address_line1:
+              type: string
+              example: Katar cd.
+            address_line2:
+              type: string
+              example: No 4
+              nullable: true
+            city:
+              type: string
+              example: IST
+            zip_code:
+              type: string
+              example: 54321
+            phone_number:
+              type: string
+              example: 1234567890
+    responses:
+      201:
+        description: Branch created successfully
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Branch created successfully
+            branch_id:
+              type: string
+              example: 123e4567-e89b-12d3-a456-426614174000
+      400:
+        description: Validation error
+      500:
+        description: Internal server error
+    """
+
     data = request.get_json()
     try:
         # Validate required fields
@@ -60,6 +109,44 @@ def create_branch():
 @branch_blueprint.route('/branches', methods=['GET'])
 @admin_required
 def get_branches():
+    """
+    Get all branches
+    ---
+    tags:
+      - Branches
+    responses:
+      200:
+        description: List of all branches
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              branch_id:
+                type: string
+                example: 123e4567-e89b-12d3-a456-426614174000
+              branch_name:
+                type: string
+                example: Istinye Branch
+              address_line1:
+                type: string
+                example: Katar cd.
+              address_line2:
+                type: string
+                example: no 4
+              city:
+                type: string
+                example: istanbul
+              zip_code:
+                type: string
+                example: 54321
+              phone_number:
+                type: string
+                example: 1234567890
+      500:
+        description: Internal server error
+    """
+
     try:
         connection = get_db_connection()
         cursor = connection.cursor()
@@ -77,6 +164,50 @@ def get_branches():
 @branch_blueprint.route('/branches/<branch_id>', methods=['GET'])
 @admin_required
 def get_branch(branch_id):
+    """
+    Get a specific branch by ID
+    ---
+    tags:
+      - Branches
+    parameters:
+      - name: branch_id
+        in: path
+        required: true
+        type: string
+        example: 123e4567-e89b-12d3-a456-426614174000
+    responses:
+      200:
+        description: Branch details
+        schema:
+          type: object
+          properties:
+            branch_id:
+              type: string
+              example: 123e4567-e89b-12d3-a456-426614174000
+            branch_name:
+              type: string
+              example: aaa Branch
+            address_line1:
+              type: string
+              example: 123 cd.
+            address_line2:
+              type: string
+              example: 321 sk.
+            city:
+              type: string
+              example: istanbul
+            zip_code:
+              type: string
+              example: 54321
+            phone_number:
+              type: string
+              example: 1234567890
+      404:
+        description: Branch not found
+      500:
+        description: Internal server error
+    """
+
     try:
         connection = get_db_connection()
         cursor = connection.cursor()
@@ -97,6 +228,58 @@ def get_branch(branch_id):
 @branch_blueprint.route('/branches/<branch_id>', methods=['PUT'])
 @admin_required
 def update_branch(branch_id):
+    """
+    Update branch details
+    ---
+    tags:
+      - Branches
+    parameters:
+      - name: branch_id
+        in: path
+        required: true
+        type: string
+        example: 123e4567-e89b-12d3-a456-426614174000
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            branch_name:
+              type: string
+              example: aaa Branch
+            address_line1:
+              type: string
+              example: ee cd.
+            address_line2:
+              type: string
+              example: no 4
+            city:
+              type: string
+              example: artvin
+            zip_code:
+              type: string
+              example: 67890
+            phone_number:
+              type: string
+              example: 9876543210
+    responses:
+      200:
+        description: Branch updated successfully
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Branch updated successfully
+      400:
+        description: Validation error
+      404:
+        description: Branch not found
+      500:
+        description: Internal server error
+    """
+
     data = request.get_json()
     try:
         connection = get_db_connection()
@@ -154,6 +337,32 @@ def update_branch(branch_id):
 @branch_blueprint.route('/branches/<branch_id>', methods=['DELETE'])
 @admin_required
 def delete_branch(branch_id):
+    """
+    Delete a branch
+    ---
+    tags:
+      - Branches
+    parameters:
+      - name: branch_id
+        in: path
+        required: true
+        type: string
+        example: 123e4567-e89b-12d3-a456-426614174000
+    responses:
+      200:
+        description: Branch deleted successfully
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Branch deleted successfully
+      404:
+        description: Branch not found
+      500:
+        description: Internal server error
+    """
+
     try:
         connection = get_db_connection()
         cursor = connection.cursor()
@@ -173,12 +382,48 @@ def delete_branch(branch_id):
     
 def get_branches_with_conditions(min_employees: int = 5, min_accounts: int = 3):
     """
-    Fetch branches with a minimum number of employees and accounts.
-
-    :param min_employees: Minimum number of employees required (default is 5).
-    :param min_accounts: Minimum number of accounts required (default is 3).
-    :return: List of dictionaries containing branch names, employee counts, and account counts.
+    Get branches with specific conditions
+    ---
+    tags:
+      - Branches
+    parameters:
+      - name: min_employees
+        in: query
+        required: false
+        type: integer
+        default: 5
+        example: 10
+      - name: min_accounts
+        in: query
+        required: false
+        type: integer
+        default: 3
+        example: 5
+    responses:
+      200:
+        description: List of branches meeting the criteria
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              branch_name:
+                type: string
+                example: Downtown Branch
+              employee_count:
+                type: integer
+                example: 12
+              account_count:
+                type: integer
+                example: 7
+      404:
+        description: No branches found
+      400:
+        description: Invalid input values
+      500:
+        description: Internal server error
     """
+
     connection = None
     cursor = None
 
@@ -213,8 +458,65 @@ def get_branches_with_conditions(min_employees: int = 5, min_accounts: int = 3):
 @admin_required
 def api_branches_with_conditions():
     """
-    API endpoint to fetch branches with a minimum number of employees and accounts.
+    Get branches with specific conditions
+    ---
+    tags:
+      - Branches
+    parameters:
+      - name: min_employees
+        in: query
+        required: false
+        type: integer
+        default: 5
+        example: 10
+        description: Minimum number of employees required.
+      - name: min_accounts
+        in: query
+        required: false
+        type: integer
+        default: 3
+        example: 7
+        description: Minimum number of accounts required.
+    responses:
+      200:
+        description: List of branches meeting the specified criteria.
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              branch_name:
+                type: string
+                example: Downtown Branch
+              employee_count:
+                type: integer
+                example: 12
+              account_count:
+                type: integer
+                example: 8
+      404:
+        description: No branches found matching the specified criteria.
+      400:
+        description: Invalid input values (e.g., negative integers).
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: Minimum values must be non-negative integers.
+      500:
+        description: Internal server error or database query failure.
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: An unexpected error occurred.
+            details:
+              type: string
+              example: Database connection failed.
     """
+
     try:
         min_employees = request.args.get('min_employees', default=5, type=int)
         min_accounts = request.args.get('min_accounts', default=3, type=int)
