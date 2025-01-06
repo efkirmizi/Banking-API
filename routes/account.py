@@ -129,7 +129,7 @@ def update_account_balance(account_id):
     result = cursor.fetchone()
     if not result:
       return jsonify({"error": "Account not found"}), 404
-    current_balance = result[0]
+    current_balance = result["balance"]
 
     # Calculate new balance
     new_balance = current_balance + amount

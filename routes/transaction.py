@@ -198,14 +198,12 @@ def get_customers_with_high_transactions(min_transaction_total):
             connection.close()
 
 
-@transaction_blueprint.route('/high_transactions', methods=['GET'])
+@transaction_blueprint.route('/high_transactions/<min_transaction_total>', methods=['GET'])
 @admin_required
-def api_customers_high_transactions():
+def api_customers_high_transactions(min_transaction_total):
     """
     API endpoint to fetch customers who made transactions totaling more than a specified amount.
     """
-    min_transaction_total = request.args.get('min_transaction_total', type=float, default=10000)
-
     try:
         results = get_customers_with_high_transactions(min_transaction_total)
         if not results:
@@ -277,11 +275,11 @@ def money_transfer():
         transaction_timestamp = datetime.now()
         cursor.execute("""
             INSERT INTO Transaction (
-                from_account_id, to_account_id, transaction_type, amount, transaction_timestamp
+                transaction_id, from_account_id, to_account_id, transaction_type, amount, transaction_timestamp
             ) VALUES (
-                %s, %s, %s, %s, %s
+                %s, %s, %s, %s, %s, %s
             )
-        """, (sender_account_id, receiver_account_id, 'TRANSFER', amount, transaction_timestamp))
+        """, (str(uuid.uuid4()), sender_account_id, receiver_account_id, 'TRANSFER', amount, transaction_timestamp))
 
         connection.commit()
 
